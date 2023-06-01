@@ -1,0 +1,28 @@
+service: signed-api-b
+
+package:
+  patterns:
+    - '!./**'
+    - './ncc/**'
+    - './package.json'
+    - ./config/airseeker.json
+
+provider:
+  name: aws
+  region: us-east-1
+  stage: '2209221310'
+  runtime: nodejs18.x
+  architecture: arm64
+  logRetentionInDays: 14
+  environment: ${file(scripts/load-secrets-env.js)}
+  deploymentMethod: direct
+
+functions:
+  airseeker:
+    handler: ./ncc/index.handler
+    maximumRetryAttempts: 0
+    maximumEventAge: 60
+    timeout: 900
+    memorySize: 512
+    events:
+      - schedule: rate(14 minutes)
