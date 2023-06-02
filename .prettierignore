@@ -20,7 +20,7 @@ build
 # Log files
 *.log
 
-airseeker.json
+# airseeker.json
 secrets.env
 
 # Ignore Serverless directories
