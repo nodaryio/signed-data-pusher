@@ -156,8 +156,11 @@ export const makeTemplateRequests = async (signedApiUpdate: SignedApiUpdate): Pr
     config: { beacons, endpoints, templates, ois, apiCredentials },
     apiLimiters,
   } = getState();
-  const { beaconIds, operationTemplateId } = signedApiUpdate;
+  const { beaconIds } = signedApiUpdate;
 
+  // Because each beacon have same operation, just take first one as operational template
+  // See the function validateTriggerReferences in validation.ts
+  const operationTemplateId = beacons[beaconIds[0]].templateId;
   const operationTemplate = templates[operationTemplateId];
 
   const parameters = abi.decode(operationTemplate.parameters);
