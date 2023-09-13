@@ -3,7 +3,7 @@ module.exports = {
   rules: {
     // eslint-plugin-functional
     'functional/prefer-tacit': 0,
-    'functional/immutable-data': ['error', { assumeTypes: true }],
+    'functional/immutable-data': ['error', { assumeTypes: true, ignoreClasses: true }],
   },
   overrides: [
     {

@@ -1,155 +1,101 @@
 {
   "airseekerWalletMnemonic": "${AIRSEEKER_WALLET_MNEMONIC}",
-  "rateLimiting": {
-    "maxGatewayConcurrency": 5,
-    "minGatewayTime": 200,
-    "maxProviderConcurrency": 5,
-    "minProviderTime": 200,
-    "minDirectGatewayTime": 200,
-    "maxDirectGatewayConcurrency": 5,
-    "overrides": {
-      "directGateways": {
-        "Currency Converter API": {
-          "minTime": 200,
-          "maxConcurrent": 5
-        }
-      }
-    }
-  },
-  "log": {
-    "format": "plain",
-    "level": "INFO"
-  },
+  "log": { "format": "plain", "level": "INFO" },
+  "rateLimiting": { "maxDirectGatewayConcurrency": 25, "minDirectGatewayTime": 10 },
   "beacons": {
-    "0xbc80cbd7a8b8180e11d189a8334814a44a69c4d083b31305ecf67a3a3ea0fd9a": {
-      "airnode": "0xA30CA71Ba54E83127214D3271aEA8F5D6bD4Dace",
-      "templateId": "0x5fadf775c50d6ec9641b9d07ab3a9ca9d92aaf64d27ea54529fb7d8ebc72e713",
-      "fetchInterval": 20,
-      "fetchMethod": "gateway"
+    "0x45157f8e0c448d36b2780ac9fa74040c864be5866e2c4f8a621c54d9a6d1baa9": {
+      "airnode": "0xc52EeA00154B4fF1EbbF8Ba39FDe37F1AC3B9Fd4",
+      "templateId": "0xcc35bd1800c06c12856a87311dd95bfcbb3add875844021d59a929d79f3c99bd"
     },
-    "0x717d60cb328ef7ea138ae1b31c78a03fe6caa1a05568b1649e89cd924321b732": {
-      "airnode": "0xA30CA71Ba54E83127214D3271aEA8F5D6bD4Dace",
-      "templateId": "0x32ee5c344877c40260b6010bb91f85f39b5a9a0f6690d4c6888af90f5613d854",
-      "fetchInterval": 20,
-      "fetchMethod": "gateway"
+    "0xe1d3bc514126e305f90484f977be17996f9389613607ac88aee3c955919fda59": {
+      "airnode": "0xc52EeA00154B4fF1EbbF8Ba39FDe37F1AC3B9Fd4",
+      "templateId": "0x086130c54864b2129f8ac6d8d7ab819fa8181bbe676e35047b1bca4c31d51c66"
     },
-    "0x924b5d4cb3ec6366ae4302a1ca6aec035594ea3ea48a102d160b50b0c43ebfb5": {
-      "airnode": "0xA30CA71Ba54E83127214D3271aEA8F5D6bD4Dace",
-      "templateId": "0xea30f92923ece1a97af69d450a8418db31be5a26a886540a13c09c739ba8eaaa",
-      "fetchInterval": 20,
-      "fetchMethod": "api"
+    "0xc139000a53aa2863d802a263a840559398d2120f50f464474188a567a59ad452": {
+      "airnode": "0xc52EeA00154B4fF1EbbF8Ba39FDe37F1AC3B9Fd4",
+      "templateId": "0x1d65c1f1e127a41cebd2339f823d0290322c63f3044380cbac105db8e522ebb9"
     }
   },
   "templates": {
-    "0x5fadf775c50d6ec9641b9d07ab3a9ca9d92aaf64d27ea54529fb7d8ebc72e713": {
-      "endpointId": "0x18a60ee2138d98b5f968b7177a8a537515e3db46d0712b8dd311625e6c2335c4",
-      "parameters": "0x317373737373730000000000000000000000000000000000000000000000000070616972000000000000000000000000000000000000000000000000000000006274635f757364000000000000000000000000000000000000000000000000005f706174680000000000000000000000000000000000000000000000000000007061796c6f61642e7677617000000000000000000000000000000000000000005f74797065000000000000000000000000000000000000000000000000000000696e7432353600000000000000000000000000000000000000000000000000005f74696d6573000000000000000000000000000000000000000000000000000031303030303030303030303030303030303030000000000000000000000000006c6f6f6b6261636b506572696f640000000000000000000000000000000000003500000000000000000000000000000000000000000000000000000000000000696e636c75646543726f737352617465730000000000000000000000000000007472756500000000000000000000000000000000000000000000000000000000"
+    "0xcc35bd1800c06c12856a87311dd95bfcbb3add875844021d59a929d79f3c99bd": {
+      "endpointId": "0x3528e42b017a5fbf9d2993a2df04efc3ed474357575065a111b054ddf9de2acc",
+      "parameters": "0x31730000000000000000000000000000000000000000000000000000000000006e616d65000000000000000000000000000000000000000000000000000000005754492f55534400000000000000000000000000000000000000000000000000"
     },
-    "0x32ee5c344877c40260b6010bb91f85f39b5a9a0f6690d4c6888af90f5613d854": {
-      "endpointId": "0x18a60ee2138d98b5f968b7177a8a537515e3db46d0712b8dd311625e6c2335c4",
-      "parameters": "0x317373737373730000000000000000000000000000000000000000000000000070616972000000000000000000000000000000000000000000000000000000006574685f757364000000000000000000000000000000000000000000000000005f706174680000000000000000000000000000000000000000000000000000007061796c6f61642e7677617000000000000000000000000000000000000000005f74797065000000000000000000000000000000000000000000000000000000696e7432353600000000000000000000000000000000000000000000000000005f74696d6573000000000000000000000000000000000000000000000000000031303030303030303030303030303030303030000000000000000000000000006c6f6f6b6261636b506572696f640000000000000000000000000000000000003500000000000000000000000000000000000000000000000000000000000000696e636c75646543726f737352617465730000000000000000000000000000007472756500000000000000000000000000000000000000000000000000000000"
+    "0x086130c54864b2129f8ac6d8d7ab819fa8181bbe676e35047b1bca4c31d51c66": {
+      "endpointId": "0x3528e42b017a5fbf9d2993a2df04efc3ed474357575065a111b054ddf9de2acc",
+      "parameters": "0x31730000000000000000000000000000000000000000000000000000000000006e616d65000000000000000000000000000000000000000000000000000000005841472f55534400000000000000000000000000000000000000000000000000"
     },
-    "0xea30f92923ece1a97af69d450a8418db31be5a26a886540a13c09c739ba8eaaa": {
-      "endpointId": "0x13dea3311fe0d6b84f4daeab831befbc49e19e6494c41e9e065a09c3c68f43b6",
-      "parameters": "0x3173737373730000000000000000000000000000000000000000000000000000746f00000000000000000000000000000000000000000000000000000000000055534400000000000000000000000000000000000000000000000000000000005f74797065000000000000000000000000000000000000000000000000000000696e7432353600000000000000000000000000000000000000000000000000005f70617468000000000000000000000000000000000000000000000000000000726573756c7400000000000000000000000000000000000000000000000000005f74696d65730000000000000000000000000000000000000000000000000000313030303030300000000000000000000000000000000000000000000000000066726f6d000000000000000000000000000000000000000000000000000000004554480000000000000000000000000000000000000000000000000000000000"
+    "0x1d65c1f1e127a41cebd2339f823d0290322c63f3044380cbac105db8e522ebb9": {
+      "endpointId": "0x3528e42b017a5fbf9d2993a2df04efc3ed474357575065a111b054ddf9de2acc",
+      "parameters": "0x31730000000000000000000000000000000000000000000000000000000000006e616d65000000000000000000000000000000000000000000000000000000005841552f55534400000000000000000000000000000000000000000000000000"
+    },
+    "0xc3267366934b1f9b1284516a78c206f4374ab53b17d2f5cf151f49c7666c4dfa": {
+      "endpointId": "0x3528e42b017a5fbf9d2993a2df04efc3ed474357575065a111b054ddf9de2acc",
+      "parameters": "0x317300000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"
     }
   },
   "endpoints": {
-    "0x13dea3311fe0d6b84f4daeab831befbc49e19e6494c41e9e065a09c3c68f43b6": {
-      "oisTitle": "Currency Converter API",
-      "endpointName": "convertToUSD"
+    "0x3528e42b017a5fbf9d2993a2df04efc3ed474357575065a111b054ddf9de2acc": {
+      "endpointName": "feed",
+      "oisTitle": "Nodary"
     }
   },
+  "triggers": {
+    "dataFeedUpdates": {},
+    "signedApiUpdates": [
+      {
+        "signedApiName": "Nodary",
+        "beaconIds": [
+          "0x45157f8e0c448d36b2780ac9fa74040c864be5866e2c4f8a621c54d9a6d1baa9",
+          "0xe1d3bc514126e305f90484f977be17996f9389613607ac88aee3c955919fda59",
+          "0xc139000a53aa2863d802a263a840559398d2120f50f464474188a567a59ad452"
+        ],
+        "operationTemplateId": "0xc3267366934b1f9b1284516a78c206f4374ab53b17d2f5cf151f49c7666c4dfa",
+        "fetchInterval": 30,
+        "updateDelay": 60
+      }
+    ]
+  },
+  "signedApis": [
+    {
+      "name": "Nodary",
+      "url": "https://pool.nodary.io"
+    }
+  ],
   "ois": [
     {
       "oisFormat": "2.0.0",
-      "version": "1.2.3",
-      "title": "Currency Converter API",
+      "title": "Nodary",
+      "version": "0.2.0",
       "apiSpecifications": {
-        "servers": [
-          {
-            "url": "http://localhost:5000"
-          }
-        ],
-        "paths": {
-          "/convert": {
-            "get": {
-              "parameters": [
-                {
-                  "in": "query",
-                  "name": "from"
-                },
-                {
-                  "in": "query",
-                  "name": "to"
-                },
-                {
-                  "in": "query",
-                  "name": "amount"
-                }
-              ]
-            }
-          }
-        },
         "components": {
           "securitySchemes": {
-            "Currency Converter Security Scheme": {
-              "in": "query",
-              "type": "apiKey",
-              "name": "access_key"
-            }
+            "NodarySecurityScheme1ApiKey": { "in": "header", "name": "x-nodary-api-key", "type": "apiKey" }
           }
         },
-        "security": {
-          "Currency Converter Security Scheme": []
-        }
+        "paths": {
+          "/feed/latest": { "get": { "parameters": [{ "in": "query", "name": "name" }] } },
+          "/feed/latestV2": { "get": { "parameters": [{ "in": "query", "name": "names" }] } }
+        },
+        "servers": [{ "url": "https://api.nodary.io" }],
+        "security": { "NodarySecurityScheme1ApiKey": [] }
       },
       "endpoints": [
         {
-          "name": "convertToUSD",
-          "operation": {
-            "method": "get",
-            "path": "/convert"
-          },
-          "fixedOperationParameters": [
-            {
-              "operationParameter": {
-                "in": "query",
-                "name": "to"
-              },
-              "value": "USD"
-            }
-          ],
+          "fixedOperationParameters": [],
+          "name": "feed",
+          "operation": { "method": "get", "path": "/feed/latestV2" },
+          "parameters": [{ "name": "name", "operationParameter": { "in": "query", "name": "names" } }],
           "reservedParameters": [
-            {
-              "name": "_type",
-              "fixed": "int256"
-            },
-            {
-              "name": "_path",
-              "fixed": "result"
-            },
-            {
-              "name": "_times",
-              "default": "1000000"
-            }
+            { "name": "_type", "fixed": "int256" },
+            { "name": "_times", "fixed": "1000000000000000000" }
           ],
-          "parameters": [
+          "preProcessingSpecifications": [],
+          "postProcessingSpecifications": [
             {
-              "name": "from",
-              "default": "EUR",
-              "operationParameter": {
-                "in": "query",
-                "name": "from"
-              }
-            },
-            {
-              "name": "amount",
-              "default": "1",
-              "operationParameter": {
-                "name": "amount",
-                "in": "query"
-              }
+              "environment": "Node",
+              "value": "const output = input.data[input.parameters.name].value;",
+              "timeoutMs": 5000
             }
           ]
         }
@@ -158,9 +104,9 @@
   ],
   "apiCredentials": [
     {
-      "oisTitle": "Currency Converter API",
-      "securitySchemeName": "Currency Converter Security Scheme",
-      "securitySchemeValue": "${SS_CURRENCY_CONVERTER_API_KEY}"
+      "oisTitle": "Nodary",
+      "securitySchemeName": "NodarySecurityScheme1ApiKey",
+      "securitySchemeValue": "${NODARY_API_KEY}"
     }
   ]
 }

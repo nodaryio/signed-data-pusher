@@ -17,8 +17,8 @@ export const beaconSchema = z
   .object({
     airnode: config.evmAddressSchema,
     templateId: config.evmIdSchema,
-    fetchInterval: z.number().int().positive(),
-    fetchMethod: fetchMethodSchema,
+    fetchInterval: z.number().int().positive().optional(),
+    fetchMethod: fetchMethodSchema.optional(),
   })
   .strict();
 
@@ -36,53 +36,6 @@ export const beaconsSchema = z.record(config.evmIdSchema, beaconSchema).superRef
     }
   });
 });
-
-export const beaconSetsSchema = z
-  .record(config.evmIdSchema, z.array(config.evmIdSchema))
-  .superRefine((beaconSets, ctx) => {
-    Object.entries(beaconSets).forEach(([beaconSetId, beacons]) => {
-      // Verify that config.beaconSets.<beaconSetId> is valid
-      // by deriving the hash of the beaconIds in the array
-      const derivedBeaconSetId = ethers.utils.keccak256(ethers.utils.defaultAbiCoder.encode(['bytes32[]'], [beacons]));
-      if (derivedBeaconSetId !== beaconSetId) {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          message: `BeaconSet ID "${beaconSetId}" is invalid`,
-          path: [beaconSetId],
-        });
-      }
-    });
-  });
-
-export const providerSchema = z
-  .object({
-    url: z.string().url(),
-    rateLimiter: limiterConfig.optional(), // optionally specifies the rate limiter configuration per RPC URL
-  })
-  .strict();
-
-export const chainSchema = z
-  .object({
-    contracts: z.record(config.evmAddressSchema).refine((contracts) => {
-      return !isNil(contracts['Api3ServerV1']);
-    }, 'Api3ServerV1 contract address is missing'),
-    providers: z.record(providerSchema),
-    options: config.chainOptionsSchema,
-  })
-  .strict();
-
-export const chainsSchema = z.record(chainSchema);
-
-export const gatewaySchema = z
-  .object({
-    apiKey: z.string().optional(),
-    url: z.string().url(),
-  })
-  .strict();
-
-export const gatewayArraySchema = z.array(gatewaySchema);
-
-export const gatewaysSchema = z.record(gatewayArraySchema);
 
 export const templateSchema = z
   .object({
@@ -102,7 +55,7 @@ export const templatesSchema = z.record(config.evmIdSchema, templateSchema).supe
     if (derivedTemplateId !== templateId) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
-        message: `Template ID "${templateId}" is invalid`,
+        message: `Template ID "${templateId}" is invalid, expected to be ${derivedTemplateId}`,
         path: [templateId],
       });
     }
@@ -145,27 +98,17 @@ export const beaconUpdateSchema = z
   .merge(baseBeaconUpdateSchema)
   .strict();
 
-export const beaconSetUpdateSchema = z
-  .object({
-    beaconSetId: config.evmIdSchema,
-  })
-  .merge(baseBeaconUpdateSchema)
-  .strict();
-
-// chainId -> sponsorAddress -> dataFeeds
-export const dataFeedUpdatesSchema = z.record(
-  z.record(
-    config.evmAddressSchema,
-    z.object({
-      beacons: z.array(beaconUpdateSchema),
-      beaconSets: z.array(beaconSetUpdateSchema),
-      updateInterval: z.number().int(),
-    })
-  )
-);
+export const signedApiUpdateSchema = z.object({
+  signedApiName: z.string(),
+  beaconIds: z.array(config.evmIdSchema),
+  operationTemplateId: config.evmIdSchema,
+  fetchInterval: z.number(),
+  updateDelay: z.number(),
+});
 
 export const triggersSchema = z.object({
-  dataFeedUpdates: dataFeedUpdatesSchema,
+  dataFeedUpdates: z.any(),
+  signedApiUpdates: z.array(signedApiUpdateSchema),
 });
 
 const validateTemplatesReferences: SuperRefinement<{ beacons: Beacons; templates: Templates; endpoints: Endpoints }> = (
@@ -268,16 +211,22 @@ const validateOisRateLimiterReferences: SuperRefinement<{ ois: OIS[]; rateLimiti
   });
 };
 
+export const signedApiSchema = z.object({
+  name: z.string(),
+  url: z.string().url(),
+});
+
 export const configSchema = z
   .object({
     airseekerWalletMnemonic: z.string(),
     log: logSchema,
     beacons: beaconsSchema,
-    beaconSets: beaconSetsSchema.optional(),
-    chains: chainsSchema.optional(),
-    gateways: gatewaysSchema.optional(),
+    beaconSets: z.any(),
+    chains: z.any(),
+    gateways: z.any(),
     templates: templatesSchema,
-    triggers: triggersSchema.optional(),
+    triggers: triggersSchema,
+    signedApis: z.array(signedApiSchema),
     ois: z.array(oisSchema),
     apiCredentials: z.array(config.apiCredentialsSchema),
     endpoints: endpointsSchema,
@@ -294,25 +243,30 @@ export const signedDataSchemaLegacy = z.object({
   data: z.object({ timestamp: z.string(), value: encodedValueSchema }),
   signature: signatureSchema,
 });
+
 export const signedDataSchema = z.object({
   timestamp: z.string(),
   encodedValue: encodedValueSchema,
   signature: signatureSchema,
 });
 
+export const signedApiPayloadSchema = signedDataSchema.extend({
+  beaconId: config.evmIdSchema,
+  airnode: config.evmAddressSchema,
+  templateId: config.evmIdSchema,
+});
+
+export const signedApiBatchPayloadSchema = z.array(signedApiPayloadSchema);
+
+export type SignedApiPayload = z.infer<typeof signedApiPayloadSchema>;
+export type SignedApiBatchPayload = z.infer<typeof signedApiBatchPayloadSchema>;
 export type Config = z.infer<typeof configSchema>;
 export type Beacon = z.infer<typeof beaconSchema>;
 export type Beacons = z.infer<typeof beaconsSchema>;
-export type BeaconSets = z.infer<typeof beaconSetsSchema>;
-export type Chain = z.infer<typeof chainSchema>;
-export type Chains = z.infer<typeof chainsSchema>;
-export type Gateway = z.infer<typeof gatewaySchema>;
-export type Gateways = z.infer<typeof gatewaysSchema>;
 export type Template = z.infer<typeof templateSchema>;
 export type Templates = z.infer<typeof templatesSchema>;
-export type DataFeedUpdates = z.infer<typeof dataFeedUpdatesSchema>;
 export type BeaconUpdate = z.infer<typeof beaconUpdateSchema>;
-export type BeaconSetUpdate = z.infer<typeof beaconSetUpdateSchema>;
+export type SignedApiUpdate = z.infer<typeof signedApiUpdateSchema>;
 export type Triggers = z.infer<typeof triggersSchema>;
 export type Address = z.infer<typeof config.evmAddressSchema>;
 export type BeaconId = z.infer<typeof config.evmIdSchema>;

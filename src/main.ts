@@ -2,7 +2,9 @@ import * as path from 'path';
 import { logger } from './logging';
 import { loadConfig } from './config';
 import { initiateFetchingBeaconData } from './fetch-beacon-data';
+import { initiateUpdatingSignedApi } from './update-signed-api';
 import { expireLimiterJobs, initializeState, updateState } from './state';
+import { initializeAirseekerWallet } from './wallets';
 
 export const handleStopSignal = (signal: string) => {
   logger.info(`Signal ${signal} received`);
@@ -25,5 +27,6 @@ export async function main() {
     logger.info('Airseeker has quit.');
   });
 
-  await Promise.all([initiateFetchingBeaconData()]);
+  initializeAirseekerWallet();
+  await Promise.all([initiateFetchingBeaconData(), initiateUpdatingSignedApi()]);
 }
