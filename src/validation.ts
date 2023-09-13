@@ -1,8 +1,11 @@
+import { isNil, uniqWith, isEqual } from 'lodash';
+import { z, SuperRefinement } from 'zod';
 import { ethers } from 'ethers';
-import { SuperRefinement, z } from 'zod';
 import { oisSchema, OIS, Endpoint as oisEndpoint } from '@api3/ois';
 import { config } from '@api3/airnode-validator';
-import isNil from 'lodash/isNil';
+import * as abi from '@api3/airnode-abi';
+import * as node from '@api3/airnode-node';
+import { preProcessApiSpecifications } from './make-request';
 
 export const logSchema = z.object({
   format: config.logFormatSchema,
@@ -101,13 +104,11 @@ export const beaconUpdateSchema = z
 export const signedApiUpdateSchema = z.object({
   signedApiName: z.string(),
   beaconIds: z.array(config.evmIdSchema),
-  operationTemplateId: config.evmIdSchema,
   fetchInterval: z.number(),
   updateDelay: z.number(),
 });
 
 export const triggersSchema = z.object({
-  dataFeedUpdates: z.any(),
   signedApiUpdates: z.array(signedApiUpdateSchema),
 });
 
@@ -163,6 +164,55 @@ const validateOisReferences: SuperRefinement<{ ois: OIS[]; endpoints: Endpoints 
   });
 };
 
+const validateTriggerReferences: SuperRefinement<{
+  ois: OIS[];
+  endpoints: Endpoints;
+  triggers: Triggers;
+  beacons: Beacons;
+  templates: Templates;
+  apiCredentials: ApisCredentials;
+}> = async (config, ctx) => {
+  const { ois, templates, endpoints, beacons, apiCredentials, triggers } = config;
+
+  for (const signedApiUpdate of triggers.signedApiUpdates) {
+    const { beaconIds } = signedApiUpdate;
+
+    // Check only if beaconIds contains more than 1 beacon
+    if (beaconIds.length > 1) {
+      const operationPayloadPromises = beaconIds.map((beaconId) => {
+        const template = templates[beacons[beaconId].templateId];
+
+        const parameters = abi.decode(template.parameters);
+        const endpoint = endpoints[template.endpointId];
+
+        const aggregatedApiCall = {
+          parameters,
+          ...endpoint,
+        };
+
+        const payload: node.ApiCallPayload = {
+          type: 'http-gateway',
+          config: { ois, apiCredentials },
+          aggregatedApiCall,
+        };
+
+        return preProcessApiSpecifications(payload);
+      });
+
+      const operationsPayloads = await Promise.all(operationPayloadPromises);
+
+      if (uniqWith(operationsPayloads, isEqual).length !== 1) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: `If beaconIds contains more than 1 beacon, the endpoint utilized by each beacons must have same operation effect`,
+          path: ['triggers', 'signedApiUpdates', triggers.signedApiUpdates.indexOf(signedApiUpdate)],
+        });
+        return;
+      }
+    }
+  }
+};
+
 const validateBeaconsReferences: SuperRefinement<{ beacons: Beacons; templates: Templates }> = (config, ctx) => {
   Object.entries(config.beacons).forEach(([beaconId, beacon]) => {
     // Verify that config.beacons.<beaconId>.templateId is
@@ -216,6 +266,12 @@ export const signedApiSchema = z.object({
   url: z.string().url(),
 });
 
+export const signedApisSchema = z.array(signedApiSchema);
+
+export const oisesSchema = z.array(oisSchema);
+
+export const apisCredentialsSchema = z.array(config.apiCredentialsSchema);
+
 export const configSchema = z
   .object({
     airseekerWalletMnemonic: z.string(),
@@ -226,9 +282,9 @@ export const configSchema = z
     gateways: z.any(),
     templates: templatesSchema,
     triggers: triggersSchema,
-    signedApis: z.array(signedApiSchema),
-    ois: z.array(oisSchema),
-    apiCredentials: z.array(config.apiCredentialsSchema),
+    signedApis: signedApisSchema,
+    ois: oisesSchema,
+    apiCredentials: apisCredentialsSchema,
     endpoints: endpointsSchema,
     rateLimiting: rateLimitingSchema.optional(),
   })
@@ -236,7 +292,9 @@ export const configSchema = z
   .superRefine(validateBeaconsReferences)
   .superRefine(validateTemplatesReferences)
   .superRefine(validateOisReferences)
-  .superRefine(validateOisRateLimiterReferences);
+  .superRefine(validateOisRateLimiterReferences)
+  .superRefine(validateTriggerReferences);
+
 export const encodedValueSchema = z.string().regex(/^0x[a-fA-F0-9]{64}$/);
 export const signatureSchema = z.string().regex(/^0x[a-fA-F0-9]{130}$/);
 export const signedDataSchemaLegacy = z.object({
@@ -278,3 +336,4 @@ export type Endpoints = z.infer<typeof endpointsSchema>;
 export type FetchMethod = z.infer<typeof fetchMethodSchema>;
 export type LimiterConfig = z.infer<typeof limiterConfig>;
 export type RateLimitingConfig = z.infer<typeof rateLimitingSchema>;
+export type ApisCredentials = z.infer<typeof apisCredentialsSchema>;

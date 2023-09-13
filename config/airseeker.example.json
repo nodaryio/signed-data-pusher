@@ -28,10 +28,6 @@
     "0x1d65c1f1e127a41cebd2339f823d0290322c63f3044380cbac105db8e522ebb9": {
       "endpointId": "0x3528e42b017a5fbf9d2993a2df04efc3ed474357575065a111b054ddf9de2acc",
       "parameters": "0x31730000000000000000000000000000000000000000000000000000000000006e616d65000000000000000000000000000000000000000000000000000000005841552f55534400000000000000000000000000000000000000000000000000"
-    },
-    "0xc3267366934b1f9b1284516a78c206f4374ab53b17d2f5cf151f49c7666c4dfa": {
-      "endpointId": "0x3528e42b017a5fbf9d2993a2df04efc3ed474357575065a111b054ddf9de2acc",
-      "parameters": "0x317300000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"
     }
   },
   "endpoints": {
@@ -41,7 +37,6 @@
     }
   },
   "triggers": {
-    "dataFeedUpdates": {},
     "signedApiUpdates": [
       {
         "signedApiName": "Nodary",
@@ -50,9 +45,8 @@
           "0xe1d3bc514126e305f90484f977be17996f9389613607ac88aee3c955919fda59",
           "0xc139000a53aa2863d802a263a840559398d2120f50f464474188a567a59ad452"
         ],
-        "operationTemplateId": "0xc3267366934b1f9b1284516a78c206f4374ab53b17d2f5cf151f49c7666c4dfa",
-        "fetchInterval": 30,
-        "updateDelay": 60
+        "fetchInterval": 5,
+        "updateDelay": 30
       }
     ]
   },
@@ -90,7 +84,13 @@
             { "name": "_type", "fixed": "int256" },
             { "name": "_times", "fixed": "1000000000000000000" }
           ],
-          "preProcessingSpecifications": [],
+          "preProcessingSpecifications": [
+            {
+              "environment": "Node",
+              "value": "const output = {};",
+              "timeoutMs": 5000
+            }
+          ],
           "postProcessingSpecifications": [
             {
               "environment": "Node",

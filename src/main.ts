@@ -15,7 +15,7 @@ export const handleStopSignal = (signal: string) => {
 };
 
 export async function main() {
-  const config = loadConfig(path.join(__dirname, '..', 'config', 'airseeker.json'), process.env);
+  const config = await loadConfig(path.join(__dirname, '..', 'config', 'airseeker.json'), process.env);
   initializeState(config);
 
   // TODO Remove

@@ -6,9 +6,9 @@ import { configSchema } from './validation';
 
 type Secrets = Record<string, string | undefined>;
 
-export const loadConfig = (configPath: string, secrets: Record<string, string | undefined>) => {
+export const loadConfig = async (configPath: string, secrets: Record<string, string | undefined>) => {
   const rawConfig = readConfig(configPath);
-  const parsedConfigRes = parseConfigWithSecrets(rawConfig, secrets);
+  const parsedConfigRes = await parseConfigWithSecrets(rawConfig, secrets);
   if (!parsedConfigRes.success) {
     throw new Error(`Invalid Airseeker configuration file: ${parsedConfigRes.error}`);
   }
@@ -29,7 +29,7 @@ export const parseConfigWithSecrets = (config: unknown, secrets: unknown) => {
   const parseSecretsRes = parseSecrets(secrets);
   if (!parseSecretsRes.success) return parseSecretsRes;
 
-  return parseConfig(interpolateSecrets(config, parseSecretsRes.data));
+  return parseConfigAsync(interpolateSecrets(config, parseSecretsRes.data));
 };
 
 export const parseSecrets = (secrets: unknown) => {
@@ -39,9 +39,8 @@ export const parseSecrets = (secrets: unknown) => {
   return result;
 };
 
-export const parseConfig = (config: unknown) => {
-  const parseConfigRes = configSchema.safeParse(config);
-  return parseConfigRes;
+export const parseConfigAsync = (config: unknown) => {
+  return configSchema.safeParseAsync(config);
 };
 
 // Regular expression that does not match anything, ensuring no escaping or interpolation happens
